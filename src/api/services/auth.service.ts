@@ -1,4 +1,4 @@
-import { UserModel, prisma } from "../../config/prisma";
+import { prisma } from "../../config/prisma";
 
 export const createUser = async (
   name: string,
