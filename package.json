@@ -6,16 +6,32 @@
   "author": "Abdullokh Musaev <musayevabdulloh76@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "ts-node ./app.ts"
+    "dev": "nodemon ./src/index.ts",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push --skip-generate --schema ./prisma/schema.prisma",
+    "db:start-admin": "prisma studio --port 5556",
+    "start": "node ./build/index.js",
+    "build": "tsc -p .",
+    "lint": "eslint --fix ./src/*.ts ./src/**/*.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "@prisma/client": "^4.14.1",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
     "prisma": "^4.14.1"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",
+    "@types/jsonwebtoken": "^9.0.2",
     "@types/node": "^20.2.5",
+    "eslint": "^8.41.0",
+    "nodemon": "^2.0.22",
     "prisma-dbml-generator": "^0.10.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4"

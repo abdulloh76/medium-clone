@@ -2,14 +2,15 @@ import { createServer } from "http";
 import express from "express";
 
 const app = express();
+const PORT = process.env.PORT || 8080;
 
 app.use(express.json());
 
 const bootstrap = () => {
   const server = createServer(app);
 
-  server.listen(3000, () => {
-    console.log("listening on port 3000");
+  server.listen(PORT, () => {
+    console.log(`Server launched on port ${PORT}`);
   });
 };
 
