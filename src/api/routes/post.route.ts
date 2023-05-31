@@ -1,10 +1,15 @@
 import { Router } from "express";
-import { getAllPosts, getPostById } from "../controllers/post.controller";
+import {
+  getAllPosts,
+  getPostById,
+  createPost,
+} from "../controllers/post.controller";
 import { authMiddleware } from "../middleware/auth.middleware";
 
 const postRouter = Router();
 
-postRouter.get("/post", authMiddleware, getAllPosts);
-postRouter.get("/post/:id", authMiddleware, getPostById);
+postRouter.post("/", authMiddleware, createPost);
+postRouter.get("/", authMiddleware, getAllPosts);
+postRouter.get("/:id", authMiddleware, getPostById);
 
 export default postRouter;
