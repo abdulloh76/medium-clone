@@ -1,6 +1,14 @@
 import { PostModel, prisma } from "../../config/prisma";
+import { CreatePostDto } from "../utils/dto";
 
-export const create = async (data: PostModel) => prisma.post.create({ data });
+export const create = async (data: {
+  title: string;
+  content: string;
+  authorId: number;
+}) =>
+  prisma.post.create({
+    data,
+  });
 
 export const getAll = async (offset: number, limit: number) =>
   prisma.post.findMany({ skip: offset, take: limit });

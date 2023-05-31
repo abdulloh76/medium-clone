@@ -4,44 +4,49 @@ import { asyncWrapper } from "../utils/apiHelper";
 import { UserModel } from "../../config/prisma";
 import bcryptjs from "bcryptjs";
 import { createUser, findUserByEmail } from "../services/auth.service";
+import {
+  SignInDto,
+  SignUpDto,
+  validateSignInDto,
+  validateSignUpDto,
+} from "../utils/dto";
 
 export const signup = asyncWrapper(
-  async (req: Request<{}, {}, UserModel>, res: Response) => {
+  async (req: Request<{}, {}, SignUpDto>, res: Response) => {
     const { name, email, password } = req.body;
-    // todo ? validation
-
     const hashRound = process.env.HASH_ROUND as string;
-    const userPassword = await bcryptjs.hash(password, +hashRound);
 
-    const user = await createUser(name, email, userPassword);
-
-    if (!user) {
-      res.status(400).json({ message: "todo something went wrong" });
-    }
-    res.json({ message: "Profile created successfully" });
+    validateSignUpDto({ name, email, password })
+      .then(() => bcryptjs.hash(password, +hashRound))
+      .then((hashedPassword) => createUser(name, email, hashedPassword))
+      .then((user) => res.json({ data: user }))
+      .catch((err) => res.status(400).json({ message: err.message }));
   }
 );
 
 export const signin = asyncWrapper(
-  async (req: Request<{}, {}, UserModel>, res: Response) => {
+  async (req: Request<{}, {}, SignInDto>, res: Response) => {
     const { email, password } = req.body;
-    // todo ? validation
-
     const tokenSecret = process.env.TOKEN_SECRET as string;
 
-    const user = await findUserByEmail(email);
-
-    if (!user || !(await bcryptjs.compare(password, user.password))) {
-      return res.status(400).json({ message: "Wrong email or password" });
-    }
-    const token = jwt.sign(
-      {
-        id: user.id,
-        email: user.email,
-      },
-      tokenSecret
-    );
-
-    res.json({ jwt_token: token });
+    validateSignInDto({ email, password })
+      .then(() => findUserByEmail(email))
+      .then(async (user) => {
+        if (!user || !(await bcryptjs.compare(password, user.password))) {
+          throw new Error("Wrong email or password");
+        }
+        return user;
+      })
+      .then((user) =>
+        jwt.sign(
+          {
+            id: user.id,
+            email: user.email,
+          },
+          tokenSecret
+        )
+      )
+      .then((token) => res.json({ jwt_token: token }))
+      .catch((err) => res.status(400).json({ message: err.message }));
   }
 );
