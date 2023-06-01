@@ -5,7 +5,7 @@
 Table User {
   id Int [pk, increment]
   name String [not null]
-  email String [not null]
+  email String [unique, not null]
   password String [not null]
   posts Post [not null]
   rating Int

@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { asyncWrapper } from "../utils/apiHelper";
-import { UserModel } from "../../config/prisma";
 import bcryptjs from "bcryptjs";
 import { createUser, findUserByEmail } from "../services/auth.service";
 import {
@@ -19,8 +18,13 @@ export const signup = asyncWrapper(
     validateSignUpDto({ name, email, password })
       .then(() => bcryptjs.hash(password, +hashRound))
       .then((hashedPassword) => createUser(name, email, hashedPassword))
-      .then((user) => res.json({ data: user }))
-      .catch((err) => res.status(400).json({ message: err.message }));
+      .then((user) => {
+        const { password, ...userDto } = user;
+        res.json({ data: userDto });
+      })
+      .catch((err) =>
+        res.status(400).json({ message: err.message, status: 400 })
+      );
   }
 );
 
@@ -47,6 +51,8 @@ export const signin = asyncWrapper(
         )
       )
       .then((token) => res.json({ jwt_token: token }))
-      .catch((err) => res.status(400).json({ message: err.message }));
+      .catch((err) =>
+        res.status(400).json({ message: err.message, status: 400 })
+      );
   }
 );

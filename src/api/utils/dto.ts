@@ -1,14 +1,14 @@
 import Joi from "joi";
 
-export type PaginationQueryParams = { offset?: number; limit?: number };
+export type PaginationQueryParams = { offset?: string; limit?: string };
 
 export type SignUpDto = { name: string; email: string; password: string };
 
 export const validateSignUpDto = async (obj: SignUpDto) => {
   const schema = Joi.object({
     name: Joi.string().required(),
-    email: Joi.string().required(),
-    password: Joi.string().required(),
+    email: Joi.string().email().required(),
+    password: Joi.string().min(4).required(),
   });
   await schema.validateAsync(obj);
 };
@@ -17,7 +17,7 @@ export type SignInDto = { email: string; password: string };
 
 export const validateSignInDto = async (obj: SignInDto) => {
   const schema = Joi.object({
-    email: Joi.string().required(),
+    email: Joi.string().email().required(),
     password: Joi.string().required(),
   });
   await schema.validateAsync(obj);
@@ -37,7 +37,7 @@ export type GetUserDto = {
   id: number;
   name: string;
   email: string;
-  rating?: number;
+  rating?: number | null;
 };
 
 export type GetPostDto = {
@@ -45,5 +45,6 @@ export type GetPostDto = {
   title: string;
   content: string;
   authorId: number;
-  rating?: number;
+  rating?: number | null;
+  couldReadInMinutes?: number;
 };

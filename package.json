@@ -8,7 +8,8 @@
   "scripts": {
     "dev": "nodemon ./src/index.ts",
     "db:generate": "prisma generate",
-    "db:push": "prisma db push --skip-generate --schema ./prisma/schema.prisma",
+    "db:reset": "prisma migrate reset --schema ./prisma/schema.prisma",
+    "db:push": "prisma db push --schema ./prisma/schema.prisma",
     "db:start-admin": "prisma studio --port 5556",
     "start": "node ./build/index.js",
     "build": "tsc -p .",

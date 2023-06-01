@@ -7,7 +7,9 @@ import {
   PaginationQueryParams,
   validateCreatePostDto,
 } from "../utils/dto";
-import { PostModel } from "../../config/prisma";
+
+// * lets think that average reading speed is 100 wpm
+const AVERAGE_READ_SPEED = 100;
 
 export const createPost = asyncWrapper(
   async (req: Request<{}, {}, CreatePostDto>, res: Response) => {
@@ -16,32 +18,46 @@ export const createPost = asyncWrapper(
 
     validateCreatePostDto({ title, content })
       .then(() => create({ title, content, authorId }))
-      .then((post) => res.json({ data: post }))
-      .catch((err) => res.status(400).json({ message: err.message }));
-
-    // todo lets think that average reading speed is 150 wpm
-    // const readingTimeInMinutes = newPost.content.split(" ").length / 150;
+      .then((post) => {
+        const couldReadInMinutes =
+          post.content.split(" ").length / AVERAGE_READ_SPEED;
+        res.json({ data: { ...post, couldReadInMinutes } });
+      })
+      .catch((err) =>
+        res.status(400).json({ message: err.message, status: 400 })
+      );
   }
 );
 
 export const getAllPosts = asyncWrapper(
   async (req: Request<{}, {}, {}, PaginationQueryParams>, res: Response) => {
+    const { id: authorId } = req.currentUser;
     const { offset = 0, limit = 10 } = req.query;
-    const posts = await getAll(offset, limit);
+    const posts = await getAll(Number(offset), Number(limit), authorId);
 
-    const postsDto = posts.map((post) => post as GetPostDto);
+    const postsDto: GetPostDto[] = posts.map((post) => {
+      const couldReadInMinutes =
+        post.content.split(" ").length / AVERAGE_READ_SPEED;
+      return { ...post, couldReadInMinutes };
+    });
     res.json({ data: postsDto });
   }
 );
 
 export const getPostById = asyncWrapper(async (req: Request, res: Response) => {
+  const { id: authorId } = req.currentUser;
   const { id } = req.params;
-  const post = await getById(Number(id));
+  const post = await getById(Number(id), authorId);
 
   if (!post) {
-    res.status(404).json({ message: "couldn't find any post with such id" });
+    res
+      .status(404)
+      .json({ message: "couldn't find any post with such id", status: 404 });
     return;
   }
 
-  res.json({ data: post as GetPostDto });
+  const couldReadInMinutes =
+    post.content.split(" ").length / AVERAGE_READ_SPEED;
+
+  res.json({ data: { ...post, couldReadInMinutes } });
 });

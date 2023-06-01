@@ -5,10 +5,14 @@ import { GetUserDto, PaginationQueryParams } from "../utils/dto";
 
 export const getAllUsers = asyncWrapper(
   async (req: Request<{}, {}, {}, PaginationQueryParams>, res: Response) => {
-    const { offset = 0, limit = 10 } = req.query;
-    const users = await getAll(offset, limit);
+    const { offset, limit } = req.query;
+    const users = await getAll(Number(offset), Number(limit));
 
-    const usersDto = users.map((user) => user as GetUserDto);
+    const usersDto: GetUserDto[] = users.map((user) => {
+      const { password, ...userDto } = user;
+      return userDto;
+    });
+
     res.json({ data: usersDto });
   }
 );

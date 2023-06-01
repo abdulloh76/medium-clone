@@ -21,17 +21,19 @@ add rating for the posts
 
 #### auth
 
-POST - /api/signup { name, email, password }
-POST - /api/signin { email, password }
+POST - /api/auth/signup { name, email, password }
+POST - /api/auth/signin { email, password }
 
 ### with token
 
+think about token as auth header: "Bearer actualToken"
+
 #### user
 
-GET - /api/user getAllUsers
+GET - /api/user getAllUsers (pagination is possible using query params &offset=0&limit=5)
 
 #### post
 
 POST - /api/post createPost { title, content }
-GET - /api/post getAllPosts
+GET - /api/post getAllPosts (pagination is possible using query params &offset=0&limit=5)
 GET - /api/post/:id getPostById

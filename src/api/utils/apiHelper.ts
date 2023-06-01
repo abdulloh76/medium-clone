@@ -12,5 +12,10 @@ export const customErrorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  res.status(500).json({ message: error.message });
+  res
+    .status(500)
+    .json({
+      message: "something went from our side, please try again later",
+      status: 500,
+    });
 };
